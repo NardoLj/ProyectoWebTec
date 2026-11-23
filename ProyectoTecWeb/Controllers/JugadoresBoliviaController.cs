@@ -100,4 +100,37 @@ public class JugadoresBoliviaController : ControllerBase
 
         return CreatedAtAction(nameof(GetById), new { id = jugador.Id }, response);
     }
+
+    [HttpPut("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Update(int id, [FromBody] JugadorBoliviaRequestDto dto)
+    {
+        var jugador = await _db.JugadoresBolivia.FindAsync(id);
+        if (jugador is null)
+        {
+            return NotFound(new { message = "Jugador no encontrado." });
+        }
+
+        var nombre = dto.Nombre.Trim();
+        var alias = dto.Alias.Trim();
+
+        if (string.IsNullOrWhiteSpace(nombre) || string.IsNullOrWhiteSpace(alias))
+        {
+            return BadRequest(new { message = "El nombre y el alias no pueden estar vacíos." });
+        }
+
+        if (await _db.JugadoresBolivia.AnyAsync(item => item.Id != id && item.Alias == alias))
+        {
+            return Conflict(new { message = "Ya existe un jugador con ese alias." });
+        }
+
+        jugador.Nombre = nombre;
+        jugador.Alias = alias;
+        await _db.SaveChangesAsync();
+
+        return NoContent();
+    }
 }

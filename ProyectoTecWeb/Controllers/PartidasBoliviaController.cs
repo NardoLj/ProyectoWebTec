@@ -96,4 +96,29 @@ public class PartidasBoliviaController : ControllerBase
 
         return CreatedAtAction(nameof(GetById), new { id = partida.Id }, response);
     }
+
+    [HttpPut("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Update(int id, [FromBody] PartidaBoliviaRequestDto dto)
+    {
+        var partida = await _db.PartidasBolivia.FindAsync(id);
+        if (partida is null)
+        {
+            return NotFound(new { message = "Partida no encontrada." });
+        }
+
+        if (!await _db.JugadoresBolivia.AnyAsync(jugador => jugador.Id == dto.JugadorId))
+        {
+            return NotFound(new { message = "El jugador indicado no existe." });
+        }
+
+        partida.JugadorId = dto.JugadorId;
+        partida.Puntaje = dto.Puntaje;
+        partida.DuracionSegundos = dto.DuracionSegundos;
+        await _db.SaveChangesAsync();
+
+        return NoContent();
+    }
 }

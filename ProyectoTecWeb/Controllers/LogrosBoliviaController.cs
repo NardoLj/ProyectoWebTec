@@ -102,4 +102,35 @@ public class LogrosBoliviaController : ControllerBase
 
         return CreatedAtAction(nameof(GetById), new { id = logro.Id }, response);
     }
+
+    [HttpPut("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Update(int id, [FromBody] LogroBoliviaRequestDto dto)
+    {
+        var logro = await _db.LogrosBolivia.FindAsync(id);
+        if (logro is null)
+        {
+            return NotFound(new { message = "Logro no encontrado." });
+        }
+
+        if (!await _db.JugadoresBolivia.AnyAsync(jugador => jugador.Id == dto.JugadorId))
+        {
+            return NotFound(new { message = "El jugador indicado no existe." });
+        }
+
+        var nombre = dto.Nombre.Trim();
+        if (string.IsNullOrWhiteSpace(nombre))
+        {
+            return BadRequest(new { message = "El nombre del logro no puede estar vacío." });
+        }
+
+        logro.JugadorId = dto.JugadorId;
+        logro.Nombre = nombre;
+        logro.Descripcion = string.IsNullOrWhiteSpace(dto.Descripcion) ? null : dto.Descripcion.Trim();
+        await _db.SaveChangesAsync();
+
+        return NoContent();
+    }
 }

@@ -31,6 +31,14 @@ public class ScoreBoliviaConfiguration : IEntityTypeConfiguration<ScoreBolivia>
             .HasDefaultValueSql("NOW()")
             .IsRequired();
 
+        builder.Property(score => score.IsDeleted)
+            .HasColumnName("is_deleted")
+            .HasDefaultValue(false)
+            .IsRequired();
+
+        builder.Property(score => score.DeletedAt)
+            .HasColumnName("deleted_at");
+
         builder.HasIndex(score => score.Score)
             .HasDatabaseName("ix_leaderboard_bolivia_score")
             .IsDescending();

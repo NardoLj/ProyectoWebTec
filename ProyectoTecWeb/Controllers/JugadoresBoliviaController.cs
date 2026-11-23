@@ -108,7 +108,7 @@ public class JugadoresBoliviaController : ControllerBase
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Update(int id, [FromBody] JugadorBoliviaRequestDto dto)
     {
-        var jugador = await _db.JugadoresBolivia.FindAsync(id);
+        var jugador = await _db.JugadoresBolivia.FirstOrDefaultAsync(item => item.Id == id);
         if (jugador is null)
         {
             return NotFound(new { message = "Jugador no encontrado." });
@@ -129,6 +129,24 @@ public class JugadoresBoliviaController : ControllerBase
 
         jugador.Nombre = nombre;
         jugador.Alias = alias;
+        await _db.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var jugador = await _db.JugadoresBolivia.FirstOrDefaultAsync(item => item.Id == id);
+        if (jugador is null)
+        {
+            return NotFound(new { message = "Jugador no encontrado." });
+        }
+
+        jugador.IsDeleted = true;
+        jugador.DeletedAt = DateTime.UtcNow;
         await _db.SaveChangesAsync();
 
         return NoContent();

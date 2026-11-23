@@ -16,6 +16,9 @@ public class LogroBoliviaConfiguration : IEntityTypeConfiguration<LogroBolivia>
         builder.Property(x => x.Descripcion).HasColumnName("descripcion").HasMaxLength(200);
         builder.Property(x => x.FechaOtorgado).HasColumnName("fecha_otorgado")
             .HasDefaultValueSql("NOW()").IsRequired();
+        builder.Property(x => x.IsDeleted).HasColumnName("is_deleted")
+            .HasDefaultValue(false).IsRequired();
+        builder.Property(x => x.DeletedAt).HasColumnName("deleted_at");
         builder.HasOne(x => x.Jugador).WithMany(x => x.Logros)
             .HasForeignKey(x => x.JugadorId).OnDelete(DeleteBehavior.Restrict);
         builder.HasIndex(x => x.JugadorId).HasDatabaseName("ix_logros_bolivia_jugador_id");

@@ -109,7 +109,7 @@ public class LogrosBoliviaController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(int id, [FromBody] LogroBoliviaRequestDto dto)
     {
-        var logro = await _db.LogrosBolivia.FindAsync(id);
+        var logro = await _db.LogrosBolivia.FirstOrDefaultAsync(item => item.Id == id);
         if (logro is null)
         {
             return NotFound(new { message = "Logro no encontrado." });
@@ -129,6 +129,24 @@ public class LogrosBoliviaController : ControllerBase
         logro.JugadorId = dto.JugadorId;
         logro.Nombre = nombre;
         logro.Descripcion = string.IsNullOrWhiteSpace(dto.Descripcion) ? null : dto.Descripcion.Trim();
+        await _db.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var logro = await _db.LogrosBolivia.FirstOrDefaultAsync(item => item.Id == id);
+        if (logro is null)
+        {
+            return NotFound(new { message = "Logro no encontrado." });
+        }
+
+        logro.IsDeleted = true;
+        logro.DeletedAt = DateTime.UtcNow;
         await _db.SaveChangesAsync();
 
         return NoContent();

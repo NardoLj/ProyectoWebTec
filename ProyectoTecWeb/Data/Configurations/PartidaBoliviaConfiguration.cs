@@ -19,6 +19,9 @@ public class PartidaBoliviaConfiguration : IEntityTypeConfiguration<PartidaBoliv
         builder.Property(x => x.Puntaje).HasColumnName("puntaje").IsRequired();
         builder.Property(x => x.DuracionSegundos).HasColumnName("duracion_segundos").IsRequired();
         builder.Property(x => x.JugadoEn).HasColumnName("jugado_en").HasDefaultValueSql("NOW()").IsRequired();
+        builder.Property(x => x.IsDeleted).HasColumnName("is_deleted")
+            .HasDefaultValue(false).IsRequired();
+        builder.Property(x => x.DeletedAt).HasColumnName("deleted_at");
         builder.HasOne(x => x.Jugador).WithMany(x => x.Partidas)
             .HasForeignKey(x => x.JugadorId).OnDelete(DeleteBehavior.Restrict);
         builder.HasIndex(x => x.JugadorId).HasDatabaseName("ix_partidas_bolivia_jugador_id");

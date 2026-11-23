@@ -94,7 +94,7 @@ public class LeaderboardBoliviaController : ControllerBase
             return BadRequest(new { message = "El nombre no puede estar vacío." });
         }
 
-        var score = await _db.BoliviaScores.FindAsync(id);
+        var score = await _db.BoliviaScores.FirstOrDefaultAsync(item => item.Id == id);
         if (score is null)
         {
             return NotFound(new { message = "Puntaje no encontrado." });
@@ -112,13 +112,14 @@ public class LeaderboardBoliviaController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(int id)
     {
-        var score = await _db.BoliviaScores.FindAsync(id);
+        var score = await _db.BoliviaScores.FirstOrDefaultAsync(item => item.Id == id);
         if (score is null)
         {
             return NotFound(new { message = "Puntaje no encontrado." });
         }
 
-        _db.BoliviaScores.Remove(score);
+        score.IsDeleted = true;
+        score.DeletedAt = DateTime.UtcNow;
         await _db.SaveChangesAsync();
 
         return NoContent();

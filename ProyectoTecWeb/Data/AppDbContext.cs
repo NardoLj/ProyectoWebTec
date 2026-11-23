@@ -25,5 +25,11 @@ public class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+
+        // Los GET normales no deben ver registros con soft delete.
+        modelBuilder.Entity<ScoreBolivia>().HasQueryFilter(score => !score.IsDeleted);
+        modelBuilder.Entity<JugadorBolivia>().HasQueryFilter(jugador => !jugador.IsDeleted);
+        modelBuilder.Entity<PartidaBolivia>().HasQueryFilter(partida => !partida.IsDeleted);
+        modelBuilder.Entity<LogroBolivia>().HasQueryFilter(logro => !logro.IsDeleted);
     }
 }

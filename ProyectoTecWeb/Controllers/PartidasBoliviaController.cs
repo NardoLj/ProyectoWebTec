@@ -103,7 +103,7 @@ public class PartidasBoliviaController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(int id, [FromBody] PartidaBoliviaRequestDto dto)
     {
-        var partida = await _db.PartidasBolivia.FindAsync(id);
+        var partida = await _db.PartidasBolivia.FirstOrDefaultAsync(item => item.Id == id);
         if (partida is null)
         {
             return NotFound(new { message = "Partida no encontrada." });
@@ -117,6 +117,24 @@ public class PartidasBoliviaController : ControllerBase
         partida.JugadorId = dto.JugadorId;
         partida.Puntaje = dto.Puntaje;
         partida.DuracionSegundos = dto.DuracionSegundos;
+        await _db.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var partida = await _db.PartidasBolivia.FirstOrDefaultAsync(item => item.Id == id);
+        if (partida is null)
+        {
+            return NotFound(new { message = "Partida no encontrada." });
+        }
+
+        partida.IsDeleted = true;
+        partida.DeletedAt = DateTime.UtcNow;
         await _db.SaveChangesAsync();
 
         return NoContent();

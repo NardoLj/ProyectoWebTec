@@ -8,5 +8,8 @@ public class LogroBolivia
     public string? Descripcion { get; set; }
     public DateTime FechaOtorgado { get; set; } = DateTime.UtcNow;
 
+    public bool IsDeleted { get; set; }
+    public DateTime? DeletedAt { get; set; }
+
     public JugadorBolivia Jugador { get; set; } = null!;
 }

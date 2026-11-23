@@ -73,11 +73,21 @@ namespace ProyectoTecWeb.Migrations
                         .HasColumnType("character varying(30)")
                         .HasColumnName("alias");
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
                     b.Property<DateTime>("FechaRegistro")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("fecha_registro")
                         .HasDefaultValueSql("NOW()");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
@@ -141,6 +151,10 @@ namespace ProyectoTecWeb.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
                     b.Property<string>("Descripcion")
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)")
@@ -151,6 +165,12 @@ namespace ProyectoTecWeb.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("fecha_otorgado")
                         .HasDefaultValueSql("NOW()");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
 
                     b.Property<int>("JugadorId")
                         .HasColumnType("integer")
@@ -219,9 +239,19 @@ namespace ProyectoTecWeb.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
                     b.Property<int>("DuracionSegundos")
                         .HasColumnType("integer")
                         .HasColumnName("duracion_segundos");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
 
                     b.Property<DateTime>("JugadoEn")
                         .ValueGeneratedOnAdd()
@@ -301,6 +331,16 @@ namespace ProyectoTecWeb.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("NOW()");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_deleted");
 
                     b.Property<string>("PlayerName")
                         .IsRequired()

@@ -100,4 +100,13 @@ public class JugadoresBoliviaController : ControllerBase
 
         return CreatedAtAction(nameof(GetById), new { id = jugador.Id }, response);
     }
+
+    // PR de práctica: duplica el método y la ruta del POST existente.
+    // Esta rama NO debe integrarse. El líder debe explicar el conflicto y cerrar la PR.
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public IActionResult CreateDuplicado([FromBody] JugadorBoliviaRequestDto dto)
+    {
+        return BadRequest(new { message = "POST duplicado de práctica." });
+    }
 }

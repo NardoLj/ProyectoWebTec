@@ -53,4 +53,23 @@ public class LogrosPeruController : ControllerBase
         var response = new LogroPeruResponseDto { Id = entity.Id, JugadorId = entity.JugadorId, Nombre = entity.Nombre, Descripcion = entity.Descripcion, FechaOtorgado = entity.FechaOtorgado };
         return CreatedAtAction(nameof(GetById), new { id = entity.Id }, response);
     }
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult<LogroPeruResponseDto>> Update(int id, [FromBody] LogroPeruRequestDto dto)
+    {
+        var entity = await _db.LogrosPeru.FirstOrDefaultAsync(l => l.Id == id);
+        if (entity is null) return NotFound(new { message = "Logro de Perú no encontrado." });
+        if (!await _db.JugadoresPeru.AnyAsync(j => j.Id == dto.JugadorId))
+            return BadRequest(new { message = "El jugador indicado no existe en Perú." });
+
+        var nombre = dto.Nombre.Trim();
+        if (string.IsNullOrWhiteSpace(nombre))
+            return BadRequest(new { message = "El nombre del logro no puede estar vacío." });
+
+        entity.JugadorId = dto.JugadorId;
+        entity.Nombre = nombre;
+        entity.Descripcion = string.IsNullOrWhiteSpace(dto.Descripcion) ? null : dto.Descripcion.Trim();
+        await _db.SaveChangesAsync();
+
+        return Ok(new LogroPeruResponseDto { Id = entity.Id, JugadorId = entity.JugadorId, Nombre = entity.Nombre, Descripcion = entity.Descripcion, FechaOtorgado = entity.FechaOtorgado });
+    }
 }

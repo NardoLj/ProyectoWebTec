@@ -44,4 +44,20 @@ public class ScoresPeruController : ControllerBase
         var response = new ScoreResponseDto { Id = entity.Id, PlayerName = entity.PlayerName, Score = entity.Score, CreatedAt = entity.CreatedAt };
         return CreatedAtAction(nameof(GetById), new { id = entity.Id }, response);
     }
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult<ScoreResponseDto>> Update(int id, [FromBody] ScoreRequestDto dto)
+    {
+        var entity = await _db.PeruScores.FirstOrDefaultAsync(s => s.Id == id);
+        if (entity is null) return NotFound(new { message = "Puntaje de Perú no encontrado." });
+
+        var playerName = dto.PlayerName.Trim();
+        if (string.IsNullOrWhiteSpace(playerName))
+            return BadRequest(new { message = "El nombre del jugador no puede estar vacío." });
+
+        entity.PlayerName = playerName;
+        entity.Score = dto.Score;
+        await _db.SaveChangesAsync();
+
+        return Ok(new ScoreResponseDto { Id = entity.Id, PlayerName = entity.PlayerName, Score = entity.Score, CreatedAt = entity.CreatedAt });
+    }
 }

@@ -28,6 +28,8 @@ WORKDIR /app
 
 COPY --from=build /app/publish .
 
+RUN mkdir -p /auth-keys && chown -R $APP_UID:$APP_UID /auth-keys
+
 ENV ASPNETCORE_ENVIRONMENT=Production
 ENV PORT=8080
 

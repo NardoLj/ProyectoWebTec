@@ -1,0 +1,162 @@
+# PROYECTO FINAL - TECNOLOGIA WEB I
+# Docker Compose de Release (4 instancias del backend)
+# Punto 7 de la consigna: cuatro instancias de la misma imagen publicada en Docker Hub
+
+name: proyectotecweb-release
+
+services:
+
+  postgres:
+    container_name: ${POSTGRES_CONTAINER_NAME:-proyectotecweb-db-release}
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-proyectotecweb}
+      POSTGRES_USER: ${POSTGRES_USER:-proyectotecweb}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cambia_esta_clave}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-proyectotecweb} -d ${POSTGRES_DB:-proyectotecweb}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 5s
+    networks:
+      - appnet
+
+  # Instancia 1 - Puerto 5001
+  api1:
+    container_name: ${API1_CONTAINER_NAME:-proyectotecweb-api-1}
+    image: ${DOCKERHUB_USER:-nardolj}/${IMAGE_NAME:-proyectowebtec}:${IMAGE_TAG:-2.0.0}
+    restart: unless-stopped
+    ports:
+      - "${RELEASE_PORT_1:-5001}:8080"
+    volumes:
+      - authkeys:/auth-keys
+    environment:
+      PORT: "8080"
+      AUTH_KEYS_PATH: /auth-keys
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=${POSTGRES_DB:-proyectotecweb};Username=${POSTGRES_USER:-proyectotecweb};Password=${POSTGRES_PASSWORD:-cambia_esta_clave}"
+      Authentication__Google__ClientId: "${GOOGLE_CLIENT_ID:-}"
+      Authentication__Google__ClientSecret: "${GOOGLE_CLIENT_SECRET:-}"
+      Authentication__Discord__ClientId: "${DISCORD_CLIENT_ID:-}"
+      Authentication__Discord__ClientSecret: "${DISCORD_CLIENT_SECRET:-}"
+      Authentication__Dropbox__ClientId: "${DROPBOX_CLIENT_ID:-}"
+      Authentication__Dropbox__ClientSecret: "${DROPBOX_CLIENT_SECRET:-}"
+      Authentication__Spotify__ClientId: "${SPOTIFY_CLIENT_ID:-}"
+      Authentication__Spotify__ClientSecret: "${SPOTIFY_CLIENT_SECRET:-}"
+      Authentication__Twitch__ClientId: "${TWITCH_CLIENT_ID:-}"
+      Authentication__Twitch__ClientSecret: "${TWITCH_CLIENT_SECRET:-}"
+      Authentication__Slack__ClientId: "${SLACK_CLIENT_ID:-}"
+      Authentication__Slack__ClientSecret: "${SLACK_CLIENT_SECRET:-}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - appnet
+
+  # Instancia 2 - Puerto 5002
+  api2:
+    container_name: ${API2_CONTAINER_NAME:-proyectotecweb-api-2}
+    image: ${DOCKERHUB_USER:-nardolj}/${IMAGE_NAME:-proyectowebtec}:${IMAGE_TAG:-2.0.0}
+    restart: unless-stopped
+    ports:
+      - "${RELEASE_PORT_2:-5002}:8080"
+    volumes:
+      - authkeys:/auth-keys
+    environment:
+      PORT: "8080"
+      AUTH_KEYS_PATH: /auth-keys
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=${POSTGRES_DB:-proyectotecweb};Username=${POSTGRES_USER:-proyectotecweb};Password=${POSTGRES_PASSWORD:-cambia_esta_clave}"
+      Authentication__Google__ClientId: "${GOOGLE_CLIENT_ID:-}"
+      Authentication__Google__ClientSecret: "${GOOGLE_CLIENT_SECRET:-}"
+      Authentication__Discord__ClientId: "${DISCORD_CLIENT_ID:-}"
+      Authentication__Discord__ClientSecret: "${DISCORD_CLIENT_SECRET:-}"
+      Authentication__Dropbox__ClientId: "${DROPBOX_CLIENT_ID:-}"
+      Authentication__Dropbox__ClientSecret: "${DROPBOX_CLIENT_SECRET:-}"
+      Authentication__Spotify__ClientId: "${SPOTIFY_CLIENT_ID:-}"
+      Authentication__Spotify__ClientSecret: "${SPOTIFY_CLIENT_SECRET:-}"
+      Authentication__Twitch__ClientId: "${TWITCH_CLIENT_ID:-}"
+      Authentication__Twitch__ClientSecret: "${TWITCH_CLIENT_SECRET:-}"
+      Authentication__Slack__ClientId: "${SLACK_CLIENT_ID:-}"
+      Authentication__Slack__ClientSecret: "${SLACK_CLIENT_SECRET:-}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - appnet
+
+  # Instancia 3 - Puerto 5003
+  api3:
+    container_name: ${API3_CONTAINER_NAME:-proyectotecweb-api-3}
+    image: ${DOCKERHUB_USER:-nardolj}/${IMAGE_NAME:-proyectowebtec}:${IMAGE_TAG:-2.0.0}
+    restart: unless-stopped
+    ports:
+      - "${RELEASE_PORT_3:-5003}:8080"
+    volumes:
+      - authkeys:/auth-keys
+    environment:
+      PORT: "8080"
+      AUTH_KEYS_PATH: /auth-keys
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=${POSTGRES_DB:-proyectotecweb};Username=${POSTGRES_USER:-proyectotecweb};Password=${POSTGRES_PASSWORD:-cambia_esta_clave}"
+      Authentication__Google__ClientId: "${GOOGLE_CLIENT_ID:-}"
+      Authentication__Google__ClientSecret: "${GOOGLE_CLIENT_SECRET:-}"
+      Authentication__Discord__ClientId: "${DISCORD_CLIENT_ID:-}"
+      Authentication__Discord__ClientSecret: "${DISCORD_CLIENT_SECRET:-}"
+      Authentication__Dropbox__ClientId: "${DROPBOX_CLIENT_ID:-}"
+      Authentication__Dropbox__ClientSecret: "${DROPBOX_CLIENT_SECRET:-}"
+      Authentication__Spotify__ClientId: "${SPOTIFY_CLIENT_ID:-}"
+      Authentication__Spotify__ClientSecret: "${SPOTIFY_CLIENT_SECRET:-}"
+      Authentication__Twitch__ClientId: "${TWITCH_CLIENT_ID:-}"
+      Authentication__Twitch__ClientSecret: "${TWITCH_CLIENT_SECRET:-}"
+      Authentication__Slack__ClientId: "${SLACK_CLIENT_ID:-}"
+      Authentication__Slack__ClientSecret: "${SLACK_CLIENT_SECRET:-}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - appnet
+
+  # Instancia 4 - Puerto 5004
+  api4:
+    container_name: ${API4_CONTAINER_NAME:-proyectotecweb-api-4}
+    image: ${DOCKERHUB_USER:-nardolj}/${IMAGE_NAME:-proyectowebtec}:${IMAGE_TAG:-2.0.0}
+    restart: unless-stopped
+    ports:
+      - "${RELEASE_PORT_4:-5004}:8080"
+    volumes:
+      - authkeys:/auth-keys
+    environment:
+      PORT: "8080"
+      AUTH_KEYS_PATH: /auth-keys
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=${POSTGRES_DB:-proyectotecweb};Username=${POSTGRES_USER:-proyectotecweb};Password=${POSTGRES_PASSWORD:-cambia_esta_clave}"
+      Authentication__Google__ClientId: "${GOOGLE_CLIENT_ID:-}"
+      Authentication__Google__ClientSecret: "${GOOGLE_CLIENT_SECRET:-}"
+      Authentication__Discord__ClientId: "${DISCORD_CLIENT_ID:-}"
+      Authentication__Discord__ClientSecret: "${DISCORD_CLIENT_SECRET:-}"
+      Authentication__Dropbox__ClientId: "${DROPBOX_CLIENT_ID:-}"
+      Authentication__Dropbox__ClientSecret: "${DROPBOX_CLIENT_SECRET:-}"
+      Authentication__Spotify__ClientId: "${SPOTIFY_CLIENT_ID:-}"
+      Authentication__Spotify__ClientSecret: "${SPOTIFY_CLIENT_SECRET:-}"
+      Authentication__Twitch__ClientId: "${TWITCH_CLIENT_ID:-}"
+      Authentication__Twitch__ClientSecret: "${TWITCH_CLIENT_SECRET:-}"
+      Authentication__Slack__ClientId: "${SLACK_CLIENT_ID:-}"
+      Authentication__Slack__ClientSecret: "${SLACK_CLIENT_SECRET:-}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - appnet
+
+volumes:
+  pgdata:
+  authkeys:
+
+networks:
+  appnet:
+    driver: bridge

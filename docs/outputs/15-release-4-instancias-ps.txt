@@ -1,0 +1,6 @@
+NAME                   IMAGE                          COMMAND                  SERVICE    CREATED              STATUS                        PORTS
+proyectotecweb-api-1   nardolj/proyectowebtec:1.0.0   "dotnet ProyectoTecW…"   api1       About a minute ago   Up About a minute             0.0.0.0:5001->8080/tcp, [::]:5001->8080/tcp
+proyectotecweb-api-2   nardolj/proyectowebtec:1.0.0   "dotnet ProyectoTecW…"   api2       About a minute ago   Up About a minute             0.0.0.0:5002->8080/tcp, [::]:5002->8080/tcp
+proyectotecweb-api-3   nardolj/proyectowebtec:1.0.0   "dotnet ProyectoTecW…"   api3       About a minute ago   Up About a minute             0.0.0.0:5003->8080/tcp, [::]:5003->8080/tcp
+proyectotecweb-api-4   nardolj/proyectowebtec:1.0.0   "dotnet ProyectoTecW…"   api4       About a minute ago   Up About a minute             0.0.0.0:5004->8080/tcp, [::]:5004->8080/tcp
+proyectotecweb-db      postgres:16-alpine             "docker-entrypoint.s…"   postgres   About a minute ago   Up About a minute (healthy)   5432/tcp

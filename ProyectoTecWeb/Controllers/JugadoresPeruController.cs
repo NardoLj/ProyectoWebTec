@@ -54,8 +54,9 @@ public class JugadoresPeruController : ControllerBase
     [HttpPut("{id:int}")]
     public async Task<ActionResult<JugadorPeruResponseDto>> Update(int id, [FromBody] JugadorPeruRequestDto dto)
     {
-        var entity = await _db.JugadoresPeru.FirstOrDefaultAsync(j => j.Id == id);
+        var entity = await _db.JugadoresPeru.IgnoreQueryFilters().FirstOrDefaultAsync(j => j.Id == id);
         if (entity is null) return NotFound(new { message = "Jugador de Perú no encontrado." });
+        if (entity.IsDeleted) return Conflict(new { message = "No se puede actualizar un jugador de Perú eliminado." });
 
         var nombre = dto.Nombre.Trim();
         var alias = dto.Alias.Trim();
@@ -69,5 +70,17 @@ public class JugadoresPeruController : ControllerBase
         await _db.SaveChangesAsync();
 
         return Ok(new JugadorPeruResponseDto { Id = entity.Id, Nombre = entity.Nombre, Alias = entity.Alias, FechaRegistro = entity.FechaRegistro });
+    }
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var entity = await _db.JugadoresPeru.IgnoreQueryFilters().FirstOrDefaultAsync(j => j.Id == id);
+        if (entity is null) return NotFound(new { message = "Jugador de Perú no encontrado." });
+        if (entity.IsDeleted) return Conflict(new { message = "El jugador de Perú ya fue eliminado." });
+
+        entity.IsDeleted = true;
+        entity.DeletedAt = DateTime.UtcNow;
+        await _db.SaveChangesAsync();
+        return NoContent();
     }
 }

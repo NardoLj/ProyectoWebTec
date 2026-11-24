@@ -39,5 +39,10 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<JugadorArgentina>().HasQueryFilter(jugador => !jugador.IsDeleted);
         modelBuilder.Entity<PartidaArgentina>().HasQueryFilter(partida => !partida.IsDeleted);
         modelBuilder.Entity<LogroArgentina>().HasQueryFilter(logro => !logro.IsDeleted);
+
+        modelBuilder.Entity<ScorePeru>().HasQueryFilter(score => !score.IsDeleted);
+        modelBuilder.Entity<JugadorPeru>().HasQueryFilter(jugador => !jugador.IsDeleted);
+        modelBuilder.Entity<PartidaPeru>().HasQueryFilter(partida => !partida.IsDeleted);
+        modelBuilder.Entity<LogroPeru>().HasQueryFilter(logro => !logro.IsDeleted);
     }
 }

@@ -56,8 +56,9 @@ public class LogrosPeruController : ControllerBase
     [HttpPut("{id:int}")]
     public async Task<ActionResult<LogroPeruResponseDto>> Update(int id, [FromBody] LogroPeruRequestDto dto)
     {
-        var entity = await _db.LogrosPeru.FirstOrDefaultAsync(l => l.Id == id);
+        var entity = await _db.LogrosPeru.IgnoreQueryFilters().FirstOrDefaultAsync(l => l.Id == id);
         if (entity is null) return NotFound(new { message = "Logro de Perú no encontrado." });
+        if (entity.IsDeleted) return Conflict(new { message = "No se puede actualizar un logro de Perú eliminado." });
         if (!await _db.JugadoresPeru.AnyAsync(j => j.Id == dto.JugadorId))
             return BadRequest(new { message = "El jugador indicado no existe en Perú." });
 
@@ -71,5 +72,18 @@ public class LogrosPeruController : ControllerBase
         await _db.SaveChangesAsync();
 
         return Ok(new LogroPeruResponseDto { Id = entity.Id, JugadorId = entity.JugadorId, Nombre = entity.Nombre, Descripcion = entity.Descripcion, FechaOtorgado = entity.FechaOtorgado });
+    }
+
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var entity = await _db.LogrosPeru.IgnoreQueryFilters().FirstOrDefaultAsync(l => l.Id == id);
+        if (entity is null) return NotFound(new { message = "Logro de Perú no encontrado." });
+        if (entity.IsDeleted) return Conflict(new { message = "El logro de Perú ya fue eliminado." });
+
+        entity.IsDeleted = true;
+        entity.DeletedAt = DateTime.UtcNow;
+        await _db.SaveChangesAsync();
+        return NoContent();
     }
 }

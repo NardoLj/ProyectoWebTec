@@ -9,4 +9,7 @@ public class PartidaPeru
     public DateTime JugadoEn { get; set; } = DateTime.UtcNow;
 
     public JugadorPeru Jugador { get; set; } = null!;
+
+    public bool IsDeleted { get; set; }
+    public DateTime? DeletedAt { get; set; }
 }

@@ -9,4 +9,7 @@ public class JugadorPeru
 
     public ICollection<PartidaPeru> Partidas { get; set; } = new List<PartidaPeru>();
     public ICollection<LogroPeru> Logros { get; set; } = new List<LogroPeru>();
+
+    public bool IsDeleted { get; set; }
+    public DateTime? DeletedAt { get; set; }
 }

@@ -62,4 +62,16 @@ public class PartidasPeruController : ControllerBase
 
         return Ok(new PartidaPeruResponseDto { Id = entity.Id, JugadorId = entity.JugadorId, Puntaje = entity.Puntaje, DuracionSegundos = entity.DuracionSegundos, JugadoEn = entity.JugadoEn });
     }
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var entity = await _db.PartidasPeru.IgnoreQueryFilters().FirstOrDefaultAsync(p => p.Id == id);
+        if (entity is null) return NotFound(new { message = "Partida de Perú no encontrada." });
+        if (entity.IsDeleted) return Conflict(new { message = "La partida de Perú ya fue eliminada." });
+
+        entity.IsDeleted = true;
+        entity.DeletedAt = DateTime.UtcNow;
+        await _db.SaveChangesAsync();
+        return NoContent();
+    }
 }

@@ -47,8 +47,9 @@ public class ScoresPeruController : ControllerBase
     [HttpPut("{id:int}")]
     public async Task<ActionResult<ScoreResponseDto>> Update(int id, [FromBody] ScoreRequestDto dto)
     {
-        var entity = await _db.PeruScores.FirstOrDefaultAsync(s => s.Id == id);
+       var entity = await _db.PeruScores.IgnoreQueryFilters().FirstOrDefaultAsync(s => s.Id == id);
         if (entity is null) return NotFound(new { message = "Puntaje de Perú no encontrado." });
+        if (entity.IsDeleted) return Conflict(new { message = "No se puede actualizar un puntaje de Perú eliminado." });
 
         var playerName = dto.PlayerName.Trim();
         if (string.IsNullOrWhiteSpace(playerName))
@@ -59,5 +60,17 @@ public class ScoresPeruController : ControllerBase
         await _db.SaveChangesAsync();
 
         return Ok(new ScoreResponseDto { Id = entity.Id, PlayerName = entity.PlayerName, Score = entity.Score, CreatedAt = entity.CreatedAt });
+    }
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var entity = await _db.PeruScores.IgnoreQueryFilters().FirstOrDefaultAsync(s => s.Id == id);
+        if (entity is null) return NotFound(new { message = "Puntaje de Perú no encontrado." });
+        if (entity.IsDeleted) return Conflict(new { message = "El puntaje de Perú ya fue eliminado." });
+
+        entity.IsDeleted = true;
+        entity.DeletedAt = DateTime.UtcNow;
+        await _db.SaveChangesAsync();
+        return NoContent();
     }
 }

@@ -51,4 +51,21 @@ public class JugadoresPeruController : ControllerBase
         var response = new JugadorPeruResponseDto { Id = entity.Id, Nombre = entity.Nombre, Alias = entity.Alias, FechaRegistro = entity.FechaRegistro };
         return CreatedAtAction(nameof(GetById), new { id = entity.Id }, response);
     }
+    [HttpPost]
+    public async Task<ActionResult<JugadorPeruResponseDto>> CreateDuplicate([FromBody] JugadorPeruRequestDto dto)
+    {
+        var nombre = dto.Nombre.Trim();
+        var alias = dto.Alias.Trim();
+        if (string.IsNullOrWhiteSpace(nombre) || string.IsNullOrWhiteSpace(alias))
+            return BadRequest(new { message = "El nombre y el alias no pueden estar vacíos." });
+        if (await _db.JugadoresPeru.AnyAsync(j => j.Alias == alias))
+            return Conflict(new { message = "Ya existe un jugador de Perú con ese alias." });
+
+        var entity = new JugadorPeru { Nombre = nombre, Alias = alias, FechaRegistro = DateTime.UtcNow };
+        _db.JugadoresPeru.Add(entity);
+        await _db.SaveChangesAsync();
+
+        var response = new JugadorPeruResponseDto { Id = entity.Id, Nombre = entity.Nombre, Alias = entity.Alias, FechaRegistro = entity.FechaRegistro };
+        return CreatedAtAction(nameof(GetById), new { id = entity.Id }, response);
+    }
 }

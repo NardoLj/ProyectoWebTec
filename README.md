@@ -615,3 +615,31 @@ Los cambios se compilaron y verificaron mediante pruebas de funcionamiento antes
 **Equipo:** Bolivia, Perú y Argentina.
 
 **Tecnologías:** .NET 10, PostgreSQL, Docker, OAuth y GitHub.
+
+## Release final 2.1.0
+
+Imagen publicada: adalidweb/circle-rush-api:2.1.0
+
+Docker Hub:
+https://hub.docker.com/r/adalidweb/circle-rush-api/tags
+
+### Ejecucion sin compilar
+
+    docker compose --env-file .env -f compose.release.yml pull
+    docker compose --env-file .env -f compose.release.yml up -d --no-build
+    bash scripts/verificar-release-4instancias.sh
+
+### Puertos del backend
+
+- API 1: 5001
+- API 2: 5002
+- API 3: 5003
+- API 4: 5004
+
+### Documentacion adicional
+
+- [TikTok Sandbox](docs/TIKTOK_SANDBOX.md)
+- [Release 2.1.0](docs/RELEASE_2.1.0.md)
+
+Se verifico la autenticacion compartida, los reportes
+autorizados y Single Sign-Out entre las cuatro instancias.

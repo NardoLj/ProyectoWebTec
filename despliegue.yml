@@ -1,49 +1,6 @@
-name: proyectotecweb
+# PROYECTO FINAL - TECNOLOGIA WEB I
+# Compose de release con cuatro instancias (Punto 7)
+# Se incluye como despliegue.yml para compatibilidad con tareas previas.
 
-services:
-  api:
-    container_name: ${API_CONTAINER_NAME}
-    image: ${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}
-    pull_policy: always
-    restart: unless-stopped
-    ports:
-      - "${API_PORT:-8080}:8080"
-    environment:
-      PORT: "8080"
-      ASPNETCORE_ENVIRONMENT: Production
-      ConnectionStrings__DefaultConnection: "Host=${POSTGRES_HOST:-postgres};Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
-      Authentication__Google__ClientId: "${GOOGLE_CLIENT_ID:-}"
-      Authentication__Google__ClientSecret: "${GOOGLE_CLIENT_SECRET:-}"
-      Authentication__Discord__ClientId: "${DISCORD_CLIENT_ID:-}"
-      Authentication__Discord__ClientSecret: "${DISCORD_CLIENT_SECRET:-}"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - appnet
-
-  postgres:
-    container_name: ${POSTGRES_CONTAINER_NAME}
-    image: postgres:16-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 5s
-      timeout: 5s
-      retries: 12
-      start_period: 5s
-    networks:
-      - appnet
-
-volumes:
-  pgdata:
-
-networks:
-  appnet:
-    driver: bridge
+include:
+  - compose.release.yml

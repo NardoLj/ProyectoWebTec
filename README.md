@@ -47,7 +47,9 @@ Cada integrante tiene dos proveedores diferentes y ninguno se repite entre los m
 
 Las cuatro tablas de Argentina están integradas, junto con sus controladores y operaciones CRUD.
 
-Las tablas y los proveedores de Perú también están integrados. Sin embargo, la versión revisada del proyecto no contiene controladores específicos de Perú.
+Las tablas, controladores y proveedores de Perú están plenamente integrados y funcionales.
+
+Todas las tablas de Bolivia están integradas con controladores CRUD, soft delete y reporte.
 
 ## 2. Tecnologías utilizadas
 
@@ -534,43 +536,91 @@ DELETE → HTTP 404
 
 En PostgreSQL se comprobó que los registros permanecían almacenados con `is_deleted = true`.
 
-## 11. Docker Hub
+## 11. Docker Hub y Compose de Release (Puntos 6 y 7)
 
-Repositorio de imágenes del líder:
+### Repositorio Docker Hub
+- **Usuario:** `nardolj`
+- **Imagen:** `proyectowebtec`
+- **Versión de entrega:** `2.0.0`
+- **Referencia completa:** `nardolj/proyectowebtec:2.0.0`
+- **URL pública:** https://hub.docker.com/r/nardolj/proyectowebtec
 
-https://hub.docker.com/r/nardolj/proyectowebtec
+### Construcción y publicación
+```bash
+docker build -f ProyectoTecWeb/Dockerfile -t nardolj/proyectowebtec:2.0.0 ProyectoTecWeb
+docker push nardolj/proyectowebtec:2.0.0
+```
 
-El archivo `despliegue.yml` permite utilizar una imagen publicada en Docker Hub.
+### Compose de Release con Cuatro Instancias (`compose.release.yml`)
+El archivo `compose.release.yml` descarga la imagen `nardolj/proyectowebtec:2.0.0` desde Docker Hub y levanta **cuatro instancias del backend** junto con PostgreSQL 16 sin compilar código fuente:
 
-Es importante comprobar que la etiqueta utilizada corresponda a una versión que incluya las funcionalidades de la Tarea 6.
+| Instancia | Puerto Externo | Puerto Interno | Función |
+|---|---|---|---|
+| `api1` | `5001` | `8080` | Instancia 1 del backend |
+| `api2` | `5002` | `8080` | Instancia 2 del backend |
+| `api3` | `5003` | `8080` | Instancia 3 del backend |
+| `api4` | `5004` | `8080` | Instancia 4 del backend |
+| `postgres` | `5432` (red interna) | `5432` | Base de datos compartida |
 
-La etiqueta `1.0.0` corresponde a una entrega anterior y no garantiza que contenga todos los cambios nuevos.
+**Compatibilidad de sesión entre instancias:** Las cuatro instancias comparten el volumen `authkeys` montado en `/auth-keys`, permitiendo que ASP.NET Core DataProtection reconozca la misma cookie de sesión en cualquiera de los puertos.
 
-La integración de GitHub no publica automáticamente una nueva imagen de Docker Hub.
+**Ejecución del Release:**
+```bash
+docker compose -f compose.release.yml up -d
+docker compose -f compose.release.yml ps
+```
 
-## 12. Evidencias de la Tarea 6
+**Verificación en los cuatro puertos:**
+```powershell
+foreach ($p in 5001..5004) {
+    Write-Host "Puerto $p health:" (Invoke-RestMethod -Uri "http://localhost:$p/health")
+    Write-Host "Puerto $p DB:" (Invoke-RestMethod -Uri "http://localhost:$p/health/db").database
+}
+```
 
-Cada integrante debe presentar un informe individual con las evidencias correspondientes a su trabajo.
+---
 
-Para Argentina se reunieron pruebas de:
+## 12. Relación de Puntos de la Consigna y Pull Requests (Punto 8)
 
-1. Creación de las cuatro tablas.
-2. Migraciones de Entity Framework Core.
-3. Inicio de sesión con Twitch.
-4. Inicio de sesión con Slack.
-5. Identidad del usuario autenticado.
-6. Cierre de sesión.
-7. Protección de controladores mediante `[Authorize]`.
-8. Respuestas HTTP 401, 200 y 201.
-9. Revisión y aprobación de Pull Requests.
-10. PR #14 rechazada sin merge.
-11. Dos commits independientes para PUT y soft delete.
-12. PUT de los cuatro controladores.
-13. DELETE lógico y respuestas HTTP 404.
-14. Registros conservados físicamente en PostgreSQL.
-15. PR #16 integrada mediante Squash and merge.
+Cada punto del Proyecto Final se desarrolló mediante ramas y Pull Requests respetando la revisión del equipo:
 
-## 13. Entrega final
+| Punto | Descripción | Responsable | Rama / PR | Estado |
+|---|---|---|---|---|
+| **1** | Frontend con Login (6 botones), Identidad y Logout verificable (HTTP 401 tras salir) | Adalid Callizaya | PR #19 (`feat-final-frontend-login-logout`) | Integrada |
+| **2** | Reporte autorizado de Argentina (`GET /api/reportes/argentina/resumen`, Twitch/Slack) | Adalid Callizaya | PR #18 (`feat-final-reporte-argentina`) | Integrada |
+| **2** | Reportes autorizados de Bolivia (Google/Discord) y Perú (Dropbox/Spotify) | Leonardo Julio y Jheferson Velasco | PR #24 (`feat/reportes-bolivia-peru`) | Integrada |
+| **3** | Dockerfiles por integrante (`Dockerfile.AdalidCallizaya`, `Dockerfile.LeonardoJulio`, `Dockerfile.JhefersonVelasco`) | Adalid Callizaya / Leonardo Julio | PR #20 y PR #25 (`feat/dockerfiles-integrantes`) | Integrada / Lista |
+| **4** | Docker Compose de desarrollo del backend con PostgreSQL y `.env` | Adalid Callizaya / Leonardo Julio | PR #21 (`feat-final-compose-dev`) | Integrada |
+| **5** | Incorporación del Frontend Nginx al mismo Compose de desarrollo (`compose.dev.yml`) | Adalid Callizaya | PR #22 (`feat-final-frontend-compose`) | Integrada |
+| **6** | Publicación de la imagen final `nardolj/proyectowebtec:2.0.0` en Docker Hub | Leonardo Julio | Rama `release/dockerhub-2.0.0` | Publicada |
+| **7** | Docker Compose de release con cuatro instancias (`compose.release.yml`, puertos 5001-5004, keys compartidas) | Leonardo Julio | Rama `feat/compose-release-4instancias` | Listo |
+| **8** | Flujo de revisión cruzada por Pull Requests en GitHub y evidencias | Equipo completo | Flujo de forks y PRs revisadas | Cumplido |
+
+### Detalle de los reportes por integrante (Punto 2)
+
+| Integrante | País | Endpoint | Tablas utilizadas | Política de autorización | Proveedores permitidos |
+|---|---|---|---|---|---|
+| **Leonardo Julio** | Bolivia | `GET /api/reportes/bolivia/resumen` | `jugadores_bolivia`, `partidas_bolivia`, `logros_bolivia`, `leaderboard_bolivia` | `ReporteBolivia` | Google, Discord |
+| **Jheferson Velasco** | Perú | `GET /api/reportes/peru/resumen` | `jugadores_peru`, `partidas_peru`, `logros_peru`, `leaderboard_peru` | `ReportePeru` | Dropbox, Spotify |
+| **Adalid Callizaya** | Argentina | `GET /api/reportes/argentina/resumen` | `jugadores_argentina`, `partidas_argentina`, `logros_argentina`, `leaderboard_argentina` | `ReporteArgentina` | Twitch, Slack |
+
+*Sin sesión: HTTP 401. Con sesión de proveedor no autorizado: HTTP 403. Con sesión autorizada: HTTP 200 con resumen estadístico.*
+
+---
+
+## 13. Evidencias del Proyecto Final
+
+Para el documento PDF / Word de entrega se requieren evidencias de:
+1. **Frontend:** Seis botones OAuth, estado cargado/deshabilitado, identidad del usuario tras login y botón «Salir».
+2. **Logout:** Ejecución de `POST /logout` y confirmación de `HTTP 401 Unauthorized` al intentar acceder a `/api/auth/me` y a endpoints protegidos.
+3. **Reportes autorizados:** Respuestas 200 (autorizado), 401 (sin sesión) y 403 (proveedor distinto) para Bolivia, Perú y Argentina.
+4. **Dockerfiles:** Compilación exitosa de cada uno de los 3 Dockerfiles de los integrantes y del Dockerfile principal.
+5. **Compose dev:** Ejecución de `docker compose -f compose.dev.yml up -d` y `ps` mostrando `frontend`, `api` y `postgres` saludables.
+6. **Docker Hub:** Imagen `nardolj/proyectowebtec:2.0.0` visible en Docker Hub y comprobación de `docker pull`.
+7. **Compose release (4 instancias):** `docker compose -f compose.release.yml ps` con 4 APIs (5001-5004) y respuestas 200 en `/health/db` en los cuatro puertos.
+8. **GitHub PRs:** Capturas del listado de Pull Requests cerradas/integradas con sus revisiones cruzadas.
+
+## 14. Entrega final
 
 La entrega del proyecto debe incluir:
 
